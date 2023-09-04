@@ -1,0 +1,61 @@
+local status, nvim_lsp = pcall(require, "lspconfig")
+if not status then
+    return
+end
+
+local protocol = require("vim.lsp.protocol")
+
+local on_attach = function(client, bufnr)
+    --avoid diagnostic underlining
+    --vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+    --    vim.lsp.diagnostic.on_publish_diagonostics, {
+    --        underline = false,
+    --        virtual_text = true,
+    --        signs = true,
+    --    }
+    --)
+
+    -- format on save
+    if client.server_capabilities.documentFormattingProvider then
+        vim.api.nvim_create_autocmd("BufWritePre", {
+            group = vim.api.nvim_create_augroup("Format", { clear = false }),
+            buffer = bufnr,
+            callback = function()
+                vim.lsp.buf.format()
+            end,
+        })
+    end
+end
+
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+-- TypeScript
+nvim_lsp.tsserver.setup({
+    on_attach = on_attach,
+    capabilities = capabilities,
+})
+
+-- CSS
+nvim_lsp.cssls.setup({
+    on_attach = on_attach,
+    capabilities = capabilities,
+})
+
+-- Tailwind
+nvim_lsp.tailwindcss.setup({
+    on_attach = on_attach,
+    capabilities = capabilities,
+})
+
+-- Python
+nvim_lsp.pyright.setup({
+    on_attach = on_attach,
+    capabilities = capabilities
+})
+
+-- HTML
+nvim_lsp.html.setup({
+    on_attach = on_attach,
+    capabilities = capabilities
+})
+
